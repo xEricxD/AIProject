@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+//Fill out your copyright notice in the Description page of Project Settings.
 
 #include "FeatureProject.h"
 #include "AStarAgentComponent.h"
@@ -22,21 +22,23 @@ void UAStarAgentComponent::BeginPlay()
     m_pathfinder = *Itr;
 
   if (!m_pathfinder)
-    UE_LOG(LogTemp, Warning, TEXT("ERROR: could not find pathfinder"));
+    UE_LOG(LogTemp, Warning, TEXT("ERROR: could not find pathfinder, AStarAgentComponent"));
   if (!m_grid)
-    UE_LOG(LogTemp, Warning, TEXT("ERROR: could not find grid"));
+    UE_LOG(LogTemp, Warning, TEXT("ERROR: could not find grid, AStarAgentComponent"));
 }
 
 void UAStarAgentComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
   Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
+  //see if we want to request a path from the pathfinder
   if (m_calculatePointsAndRequestPath)
   {
     CalculatePointsAndRequestPath(m_targetPosDebug);
     m_calculatePointsAndRequestPath = false;
   }
 
+  //if we have a path, draw it
   if (m_path)
   {
     if (!m_path->path.Num())
@@ -65,7 +67,7 @@ void UAStarAgentComponent::CancelCurrentPath()
   FAStarCell* current = m_grid->GetCellByPosition(pos);
   if (current && !current->walkable)
   {
-    // push ourselves out
+    //push ourselves out if we are
     FVector dir = pos - current->position;
     dir.X = FMath::Clamp<float>(dir.X, -1, 1);
     dir.Y = FMath::Clamp<float>(dir.Y, -1, 1);

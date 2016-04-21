@@ -1,19 +1,18 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+//Fill out your copyright notice in the Description page of Project Settings.
 
 #include "FeatureProject.h"
 #include "AStarAgentComponent.h"
 #include "AStarPathfinderActor.h"
 
 
-// Sets default values
+//Sets default values
 AAStarPathfinderActor::AAStarPathfinderActor()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+ 	//Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-
 }
 
-// Called when the game starts or when spawned
+//Called when the game starts or when spawned
 void AAStarPathfinderActor::BeginPlay()
 {
 	Super::BeginPlay();
@@ -22,7 +21,7 @@ void AAStarPathfinderActor::BeginPlay()
     m_grid = *Itr;
 
   if (!m_grid)
-    UE_LOG(LogTemp, Error, TEXT("ERROR: could not find grid"));
+    UE_LOG(LogTemp, Error, TEXT("ERROR: could not find grid, AStartPathfinderActor.cpp"));
 
 }
 
@@ -36,7 +35,7 @@ void AAStarPathfinderActor::RequestPath(UActorComponent* a_requester, FAStarCell
   m_pathQueue.Enqueue(newPacket);
 }
 
-// Called every frame
+//Called every frame
 void AAStarPathfinderActor::Tick( float DeltaTime )
 {
 	Super::Tick( DeltaTime );
@@ -68,7 +67,7 @@ void AAStarPathfinderActor::Tick( float DeltaTime )
           cell = c;
       }
 
-      // remove lowest f node from open list and add to closed list
+      //remove lowest f node from open list and add to closed list
       m_openList.Remove(cell);
 
       if (cell != currentPacket.targetCell)
@@ -82,6 +81,7 @@ void AAStarPathfinderActor::Tick( float DeltaTime )
         targetFound = true;
     }
 
+    //create the found path and set it on the requesting agent
     FPath* path = new FPath();
     CreatePath(currentPacket.targetCell, path);
     ((UAStarAgentComponent*)(currentPacket.requestingActor))->SetPath(path);
@@ -90,6 +90,7 @@ void AAStarPathfinderActor::Tick( float DeltaTime )
       Clear();
   }
 
+  //used for debugging, if we don't auto clear we can see which cells have been added to the open and closed lists
   if (!m_autoClear && m_clear)
   {
     Clear();
@@ -114,7 +115,7 @@ void AAStarPathfinderActor::AddNeighbors(FAStarCell* a_cell)
 {
   for (int i = 0; i < 8; i++)
   {
-    short g = (i < 4) ? 10 : 14;
+    short g = (i < 4) ? 10 : 14; //we set straight neighbors first, so if i < 4 it means we're dealing with a straight neighbor
     if (a_cell->neighbors[i])
     {
       FAStarCell* cell = a_cell->neighbors[i];
@@ -131,7 +132,7 @@ void AAStarPathfinderActor::AddNeighbors(FAStarCell* a_cell)
         }
         else
         {
-          //check fi the path to the current node is shorter than the one we have
+          //check if the path to the current node is shorter than the one we have
           Relax(cell, a_cell, g);
         }
       }
@@ -144,7 +145,7 @@ void AAStarPathfinderActor::Relax(FAStarCell* a_targetCell, FAStarCell* a_startC
   FAStarCell* startCell = a_startCell;
   FAStarCell* targetCell = a_targetCell;
 
-  //check if path to targetnode is shrter if we go through startnode instead of current path
+  //check if path to targetnode is shorter if we go through startnode instead of current path
   if (targetCell->g > startCell->g + a_cost)
   {
     targetCell->parentCell = startCell;
@@ -158,7 +159,7 @@ int AAStarPathfinderActor::GetHeuristic(FAStarCell* a_cell)
 {
   FAStarPathfindingPacket currentPacket;
   m_pathQueue.Peek(currentPacket);
-
+  //use manhattan hueristic to calculate h value
   int x = (int)(FMath::Abs(a_cell->position.X - currentPacket.targetCell->position.X) / 100.0f);
   int y = (int)(FMath::Abs(a_cell->position.Y - currentPacket.targetCell->position.Y) / 100.0f);
 

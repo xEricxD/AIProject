@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+//Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -15,13 +15,13 @@ class FEATUREPROJECT_API UJPSPlusAgentComponent : public UPathfindingAgentCompon
 	GENERATED_BODY()
 
 public:	
-	// Sets default values for this component's properties
+	//Sets default values for this component's properties
   UJPSPlusAgentComponent();
 
-	// Called when the game starts
+	//Called when the game starts
 	virtual void BeginPlay() override;
 	
-	// Called every frame
+	//Called every frame
 	virtual void TickComponent( float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction ) override;
 
   virtual void SetPath(FPath* a_path) override;

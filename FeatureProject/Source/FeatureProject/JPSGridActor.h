@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+//Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -39,13 +39,13 @@ class FEATUREPROJECT_API AJPSGridActor : public AActor
 	GENERATED_BODY()
 	
 public:	
-	// Sets default values for this actor's properties
+	//Sets default values for this actor's properties
 	AJPSGridActor();
 
-	// Called when the game starts or when spawned
+	//Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 	
-	// Called every frame
+	//Called every frame
 	virtual void Tick( float DeltaSeconds ) override;
 
   void ExtendGrid(FVector a_newGridSize);
@@ -54,9 +54,9 @@ public:
   FJPSCell* GetCellByPosition(FVector a_position);
   FJPSCell* GetCellByIndex(FVector a_index);
 
-  FVector GetGridCellSize() { return m_gridCellSize; } // GridCellSize is in world units
-  FVector GetGrifOffSet() { return m_gridOffSet; } // Offset is defined in the amount of cells
-  FVector GetGridSize() { return m_gridSize; } // Returns the size in #of cells per axis
+  FVector GetGridCellSize() { return m_gridCellSize; } //GridCellSize is in world units
+  FVector GetGrifOffSet() { return m_gridOffSet; } //Offset is defined in the amount of cells
+  FVector GetGridSize() { return m_gridSize; } //Returns the size in #of cells per axis
 
 private:
   void DrawDebug();

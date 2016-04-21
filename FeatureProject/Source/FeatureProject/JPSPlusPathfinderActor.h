@@ -98,6 +98,6 @@ private:
 
   // function pointer that returns void type and takes in 2 arguments: a pathfindingcell and a short
   typedef void (AJPSPlusPathfinderActor::*FunctionPtrType)(FPathfindingCell* a_current, short jumpDistance);
-  //map of function pointers with jump directions
+  // map of function pointers with jump directions
   TMap < EJumpDirections, FunctionPtrType > m_jumpMap;	
 };

@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+//Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -13,13 +13,13 @@ class FEATUREPROJECT_API AJPSPathfinderActor : public AActor
 	GENERATED_BODY()
 	
 public:	
-	// Sets default values for this actor's properties
+	//Sets default values for this actor's properties
   AJPSPathfinderActor();
 
-	// Called when the game starts or when spawned
+	//Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 	
-	// Called every frame
+	//Called every frame
 	virtual void Tick( float DeltaSeconds ) override;
 
   void RequestPath(UActorComponent* a_requester, FJPSCell* a_startCell, FJPSCell* a_targetCell);
@@ -36,8 +36,8 @@ private:
   bool CheckStraightForcedNeighbor(FJPSCell* a_cell, FVector a_offset, FVector a_dir);
   bool CheckDiagonalForcedNeighbor(FJPSCell* a_cell, FVector a_offset, FVector a_dir);
 
-  TArray<FJPSCell*> JumpStraight(FJPSCell* a_current, FVector a_jumpDirection);
-  TArray<FJPSCell*> JumpDiagonal(FJPSCell* a_current, FVector a_jumpDirection);
+  TArray<FJPSCell*> PruneStraight(FJPSCell* a_current, FVector a_jumpDirection);
+  TArray<FJPSCell*> PruneDiagonal(FJPSCell* a_current, FVector a_jumpDirection);
 
   int GetHeuristic(FJPSCell* a_cell);
   void CreatePath(FJPSCell* a_cell, FPath* a_path);

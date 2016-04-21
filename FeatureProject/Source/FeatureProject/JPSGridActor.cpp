@@ -1,18 +1,18 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+//Fill out your copyright notice in the Description page of Project Settings.
 
 #include "FeatureProject.h"
 #include "JPSGridActor.h"
 
 
-// Sets default values
+//Sets default values
 AJPSGridActor::AJPSGridActor()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+ 	//Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
 }
 
-// Called when the game starts or when spawned
+//Called when the game starts or when spawned
 void AJPSGridActor::BeginPlay()
 {
 	Super::BeginPlay();
@@ -41,6 +41,7 @@ void AJPSGridActor::GenerateGrid()
   FVector counter(0, 0, 0);
 
   FVector rowOffset(0, 0, 0);
+  //make a collision shape to test for walls
   FCollisionShape collisionShape;
   collisionShape.MakeBox(m_gridCellSize * 0.98f);
   collisionShape.Box.HalfExtentX = (m_gridCellSize.X * 0.98f * 0.5f);
@@ -71,7 +72,7 @@ void AJPSGridActor::GenerateGrid()
     for (int j = 0; j < 8; j++)
       newCell.neighbors[j] = nullptr;
 
-    // Do Collision Test
+    //Do Collision Test
     FVector position = cellPos;
     if (world->OverlapBlockingTestByProfile(position, rotation, profileName, collisionShape, params))
     {
@@ -81,6 +82,7 @@ void AJPSGridActor::GenerateGrid()
 
     m_grid.Add(newCell);
 
+    //increment the grid index
     if (counter.X < m_gridSize.X - 1)
       counter.X++;
     else if (counter.Y < m_gridSize.Y - 1)
@@ -122,34 +124,21 @@ void AJPSGridActor::AddNeighbors(FJPSCell &a_cell)
 
   //now add diagonals
   //left - top
-  //if top or left cell is not a neighbor yet, we can't move to the diagonal because one of those nodes is unavailable
-  //if (a_cell.neighbors[0] && a_cell.neighbors[2])
-  {
-    c = GetCellByIndex(a_cell.gridIndex + FVector(-1, -1, 0));
-    if (c && c->walkable)
-      a_cell.neighbors[4] = c;
-  }
+  c = GetCellByIndex(a_cell.gridIndex + FVector(-1, -1, 0));
+  if (c && c->walkable)
+    a_cell.neighbors[4] = c;
   //left - bottom
-  //if (a_cell.neighbors[0] && a_cell.neighbors[3])
-  {
-    c = GetCellByIndex(a_cell.gridIndex + FVector(-1, 1, 0));
-    if (c && c->walkable)
-      a_cell.neighbors[5] = c;
-  }
+  c = GetCellByIndex(a_cell.gridIndex + FVector(-1, 1, 0));
+  if (c && c->walkable)
+    a_cell.neighbors[5] = c;
   //right - top
-  //if (a_cell.neighbors[1] && a_cell.neighbors[2])
-  {
-    c = GetCellByIndex(a_cell.gridIndex + FVector(1, -1, 0));
-    if (c && c->walkable)
-      a_cell.neighbors[6] = c;
-  }
+  c = GetCellByIndex(a_cell.gridIndex + FVector(1, -1, 0));
+  if (c && c->walkable)
+    a_cell.neighbors[6] = c;
   //right - bottom
-  //if (a_cell.neighbors[1] && a_cell.neighbors[3])
-  {
-    c = GetCellByIndex(a_cell.gridIndex + FVector(1, 1, 0));
-    if (c && c->walkable)
-      a_cell.neighbors[7] = c;
-  }
+  c = GetCellByIndex(a_cell.gridIndex + FVector(1, 1, 0));
+  if (c && c->walkable)
+    a_cell.neighbors[7] = c;
 }
 
 void AJPSGridActor::ExtendGrid(FVector a_newGridSize)
@@ -167,7 +156,7 @@ void AJPSGridActor::ExtendGrid(FVector a_newGridSize, FVector a_newGridOffset)
   GenerateGrid();
 }
 
-// Called every frame
+//Called every frame
 void AJPSGridActor::Tick( float DeltaTime )
 {
 	Super::Tick( DeltaTime );
@@ -183,14 +172,14 @@ FJPSCell* AJPSGridActor::GetCellByPosition(FVector a_position)
 
   int xIndex = FMath::RoundToInt(offset.X / m_gridCellSize.X);
   int yIndex = FMath::RoundToInt(offset.Y / m_gridCellSize.Y);
-  int zIndex = 0;// We're not using height FMath::RoundToInt(offset.Z / m_gridCellSize.Z);
+  int zIndex = 0;//We're not using height
 
   return GetCellByIndex(FVector(xIndex, yIndex, zIndex));
 }
 
 FJPSCell* AJPSGridActor::GetCellByIndex(FVector a_index)
 {
-  //just do a check if the index asked for is within grid bounds and then return
+  //do a check if the index asked for is within grid bounds and then return
   if (a_index.X < 0 || a_index.Y < 0 || a_index.Z < 0)
     return nullptr;
 

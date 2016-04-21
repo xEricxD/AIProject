@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+//Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -27,7 +27,7 @@ struct FAStarPathfindingPacket
 {
   GENERATED_USTRUCT_BODY()
 
-    UActorComponent* requestingActor;
+  UActorComponent* requestingActor;
   FAStarCell* startCell;
   FAStarCell* targetCell;
 };
@@ -38,28 +38,30 @@ class FEATUREPROJECT_API AAStarGrid : public AActor
 	GENERATED_BODY()
 	
 public:	
-	// Sets default values for this actor's properties
+	//Sets default values for this actor's properties
 	AAStarGrid();
 
-	// Called when the game starts or when spawned
+	//Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 	
-	// Called every frame
+	//Called every frame
 	virtual void Tick( float DeltaSeconds ) override;
 
+  //functions for changing grid size
   void ExtendGrid(FVector a_newGridSize);
   void ExtendGrid(FVector a_newGridSize, FVector a_newGridOffset);
 
   FAStarCell* GetCellByPosition(FVector a_position);
   FAStarCell* GetCellByIndex(FVector a_index);
 
-  FVector GetGridCellSize() { return m_gridCellSize; } // GridCellSize is in world units
-  FVector GetGrifOffSet() { return m_gridOffSet; } // Offset is defined in the amount of cells
-  FVector GetGridSize() { return m_gridSize; } // Returns the size in #of cells per axis
+  FVector GetGridCellSize() { return m_gridCellSize; } //GridCellSize is in world units
+  FVector GetGrifOffSet() { return m_gridOffSet; } //Offset is defined in the amount of cells
+  FVector GetGridSize() { return m_gridSize; } //Returns the size in #of cells per axis
 
 private:
   void DrawDebug();
 
+  //calculate the neighbors of this cell
   void AddNeighbors(FAStarCell &a_Cell);
   TArray<FAStarCell> m_grid;
 

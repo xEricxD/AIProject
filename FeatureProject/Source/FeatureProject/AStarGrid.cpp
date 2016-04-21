@@ -1,17 +1,17 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+//Fill out your copyright notice in the Description page of Project Settings.
 
 #include "FeatureProject.h"
 #include "AStarGrid.h"
 
-// Sets default values
+//Sets default values
 AAStarGrid::AAStarGrid()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+ 	//Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
 }
 
-// Called when the game starts or when spawned
+//Called when the game starts or when spawned
 void AAStarGrid::BeginPlay()
 {
 	Super::BeginPlay();
@@ -40,6 +40,7 @@ void AAStarGrid::GenerateGrid()
   FVector counter(0, 0, 0);
 
   FVector rowOffset(0, 0, 0);
+  //create a collision shape to test for wall nodes
   FCollisionShape collisionShape;
   collisionShape.MakeBox(m_gridCellSize * 0.98f);
   collisionShape.Box.HalfExtentX = (m_gridCellSize.X * 0.98f * 0.5f);
@@ -59,6 +60,7 @@ void AAStarGrid::GenerateGrid()
     cellPos.Y = startPos.Y + counter.Y * m_gridCellSize.Y;
     cellPos.Z = startPos.Z + counter.Z * m_gridCellSize.Z;
 
+    //set variables for new cell
     FAStarCell newCell;
     newCell.position = cellPos;
     newCell.gridIndex = counter;
@@ -70,7 +72,7 @@ void AAStarGrid::GenerateGrid()
     for (int j = 0; j < 8; j++)
       newCell.neighbors[j] = nullptr;
 
-    // Do Collision Test
+    //Do Collision Test
     FVector position = cellPos;
     if (world->OverlapBlockingTestByProfile(position, rotation, profileName, collisionShape, params))
     {
@@ -79,6 +81,7 @@ void AAStarGrid::GenerateGrid()
     }
     m_grid.Add(newCell);
 
+    //increment the grid index
     if (counter.X < m_gridSize.X - 1)
       counter.X++;
     else if (counter.Y < m_gridSize.Y - 1)
@@ -165,7 +168,7 @@ void AAStarGrid::ExtendGrid(FVector a_newGridSize, FVector a_newGridOffset)
   GenerateGrid();
 }
 
-// Called every frame
+//Called every frame
 void AAStarGrid::Tick( float DeltaTime )
 {
 	Super::Tick( DeltaTime );
@@ -179,16 +182,17 @@ FAStarCell* AAStarGrid::GetCellByPosition(FVector a_position)
   FVector startPosOfGrid = (FVector(m_gridOffSet.X * m_gridCellSize.X, m_gridOffSet.Y * m_gridCellSize.Y, m_gridOffSet.Z * m_gridCellSize.Z));
   FVector offset = -startPosOfGrid + a_position;
 
+  //calculate the index using the position passed in
   int xIndex = FMath::RoundToInt(offset.X / m_gridCellSize.X);
   int yIndex = FMath::RoundToInt(offset.Y / m_gridCellSize.Y);
-  int zIndex = 0;// We're not using height FMath::RoundToInt(offset.Z / m_gridCellSize.Z);
+  int zIndex = 0; //We're not using height
 
   return GetCellByIndex(FVector(xIndex, yIndex, zIndex));
 }
 
 FAStarCell* AAStarGrid::GetCellByIndex(FVector a_index)
 {
-  //just do a check if the index asked for is within grid bounds and then return
+  //do a check if the index asked for is within grid bounds and then return
   if (a_index.X < 0 || a_index.Y < 0 || a_index.Z < 0)
     return nullptr;
 

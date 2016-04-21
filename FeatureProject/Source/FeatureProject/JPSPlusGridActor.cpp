@@ -1,17 +1,55 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+//Fill out your copyright notice in the Description page of Project Settings.
+/*
+* Copyright(c) 2014 - 2015, Steve Rabin
+* All rights reserved.
+* Copyright (c) 2014-2015, Steve Rabin
+* All rights reserved.
+*
+* An explanation of the JPS+ algorithm is contained in Chapter 14
+* of the book Game AI Pro 2, edited by Steve Rabin, CRC Press, 2015.
+* A presentation on Goal Bounding titled "JPS+: Over 100x Faster than A*"
+* can be found at www.gdcvault.com from the 2015 GDC AI Summit.
+* A copy of this code is on the website http://www.gameaipro.com.
+*
+* If you develop a way to improve this code or make it faster, please
+* contact steve.rabin@gmail.com and share your insights. I would
+* be equally eager to hear from anyone integrating this code or using
+* the Goal Bounding concept in a commercial application or game.
+*
+* Redistribution and use in source and binary forms, with or without
+* modification, are permitted provided that the following conditions are met:
+*     * Redistributions of source code must retain the above copyright
+*       notice, this list of conditions and the following disclaimer.
+*     * Redistributions in binary form must reproduce the above copyright
+*       notice, this list of conditions and the following disclaimer in the
+*       documentation and/or other materials provided with the distribution.
+*     * The name of the author may not be used to endorse or promote products
+*       derived from this software without specific prior written permission.
+*
+* THIS SOFTWARE IS PROVIDED BY STEVE RABIN ``AS IS'' AND ANY
+* EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+* WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+* DISCLAIMED. IN NO EVENT SHALL <copyright holder> BE LIABLE FOR ANY
+* DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+* (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+* LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+* ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+* (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+* SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
 
 #include "FeatureProject.h"
 #include "JPSPlusGridActor.h"
 
-// Sets default values
+//Sets default values
 AJPSPlusGridActor::AJPSPlusGridActor()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+ 	//Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
 }
 
-// Called when the game starts or when spawned
+//Called when the game starts or when spawned
 void AJPSPlusGridActor::BeginPlay()
 {
 	Super::BeginPlay();
@@ -22,7 +60,7 @@ void AJPSPlusGridActor::BeginPlay()
 	
 }
 
-// Called every frame
+//Called every frame
 void AJPSPlusGridActor::Tick( float DeltaTime )
 {
 	Super::Tick( DeltaTime );
@@ -47,6 +85,7 @@ void AJPSPlusGridActor::GenerateGrid()
   FVector counter(0, 0, 0);
 
   FVector rowOffset(0, 0, 0);
+  //make a collision shape to test for walls
   FCollisionShape collisionShape;
   collisionShape.MakeBox(m_cellSize * 0.98f);
   collisionShape.Box.HalfExtentX = (m_cellSize.X * 0.98f * 0.5f);
@@ -76,7 +115,7 @@ void AJPSPlusGridActor::GenerateGrid()
     for (int j = 0; j < 8; j++)
       newCell.distanceToJumppoint[j] = 0;
 
-    // Do Collision Test
+    //Do Collision Test
     FVector position = cellPos;
     if (world->OverlapBlockingTestByProfile(position, rotation, profileName, collisionShape, params))
     {
@@ -109,7 +148,7 @@ void AJPSPlusGridActor::PrecalculateJumpPoints()
 
   for (int i = 0; i < m_grid.Num(); i++)
   {
-    // for every cell on the grid, test if the cell is a forced neighbour for any of its directions (O(n) compute)
+    //for every cell on the grid, test if the cell is a forced neighbour for any of its directions (O(n) compute)
     FPrimaryJumpPoint newJP;
     newJP.isjumpPoint = false;
     for (int j = -1; j < 2; j++)
@@ -134,13 +173,13 @@ void AJPSPlusGridActor::PrecalculateJumpPoints()
     JumpPointGrid[i] = newJP;
   }
 
-  // Now that we have all primary jump points, let's calculate the straight jump points
+  //Now that we have all primary jump points, let's calculate the straight jump points
   for (int i = 0; i < m_grid.Num(); i++)
   {
     FPathfindingCell* c = &m_grid[i];
     if (c && c->walkable)
     {
-      // go in 4 straight directions, and jump until we hit a wall, or a primary jump point
+      //go in 4 straight directions, and jump until we hit a wall, or a primary jump point
       c->distanceToJumppoint[1] = JumpStraight(c, FVector(0, -1, 0));
       c->distanceToJumppoint[3] = JumpStraight(c, FVector(-1, 0, 0));
       c->distanceToJumppoint[4] = JumpStraight(c, FVector(1, 0, 0));
@@ -154,7 +193,7 @@ void AJPSPlusGridActor::PrecalculateJumpPoints()
     FPathfindingCell* c = &m_grid[i];
     if (c && c->walkable)
     {
-      // go in 4 diagonal directions, and jump until we hit a wall, or a straight jump point
+      //go in 4 diagonal directions, and jump until we hit a wall, or a straight jump point
       c->distanceToJumppoint[0] = JumpDiagonal(c, FVector(-1, -1, 0));
       c->distanceToJumppoint[2] = JumpDiagonal(c, FVector(1, -1, 0));
       c->distanceToJumppoint[5] = JumpDiagonal(c, FVector(-1, 1, 0));
@@ -166,7 +205,7 @@ void AJPSPlusGridActor::PrecalculateJumpPoints()
 bool AJPSPlusGridActor::TestStraightForcedNeighbour(FPathfindingCell* a_origCell, FPathfindingCell* a_directioncell, FVector a_direction, FPrimaryJumpPoint& a_jp)
 {
   //test for unwalkable cells that would make a_cell a forced neighbour
-  if (a_direction.Y == 0) // moving on x axis
+  if (a_direction.Y == 0) //moving on x axis
   {
     FPathfindingCell* c = GetCellByIndex(a_directioncell->gridIndex + FVector(0, -1, 0)); //test top cell
     if (!c || !c->walkable)
@@ -248,7 +287,7 @@ short AJPSPlusGridActor::JumpStraight(FPathfindingCell* a_Cell, FVector a_direct
   return -dist;
 }
 
-// TODO - fix diagonal wall avoidance (currently moves diagonal over walls)
+//TODO - fix diagonal wall avoidance (currently moves diagonal if diagonal.x or diagonal.y is a wall)
 short AJPSPlusGridActor::JumpDiagonal(FPathfindingCell* a_Cell, FVector a_direction)
 {
   FVector index = a_Cell->gridIndex + a_direction;
@@ -309,14 +348,14 @@ FPathfindingCell* AJPSPlusGridActor::GetCellByPosition(FVector a_position)
 
   int xIndex = FMath::RoundToInt(offset.X / m_cellSize.X);
   int yIndex = FMath::RoundToInt(offset.Y / m_cellSize.Y);
-  int zIndex = 0;// We're not using height FMath::RoundToInt(offset.Z / m_cellSize.Z);
+  int zIndex = 0; //We're not using height FMath::RoundToInt(offset.Z / m_cellSize.Z);
 
   return GetCellByIndex(FVector(xIndex, yIndex, zIndex));
 }
 
 FPathfindingCell* AJPSPlusGridActor::GetCellByIndex(FVector a_index)
 {
-  //just do a check if the index asked for is within grid bounds and then return
+  //do a check if the index asked for is within grid bounds and then return
   if (a_index.X < 0 || a_index.Y < 0 || a_index.Z < 0)
     return nullptr;
 

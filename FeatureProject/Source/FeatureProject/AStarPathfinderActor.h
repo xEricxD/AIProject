@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+//Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -14,15 +14,16 @@ class FEATUREPROJECT_API AAStarPathfinderActor : public AActor
 	GENERATED_BODY()
 	
 public:	
-	// Sets default values for this actor's properties
+	//Sets default values for this actor's properties
 	AAStarPathfinderActor();
 
-	// Called when the game starts or when spawned
+	//Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 	
-	// Called every frame
+	//Called every frame
 	virtual void Tick( float DeltaSeconds ) override;
 
+  //Agents call this when they need a new path
   void RequestPath(UActorComponent* a_requester, FAStarCell* a_startCell, FAStarCell* a_targetCell);
 
 private:

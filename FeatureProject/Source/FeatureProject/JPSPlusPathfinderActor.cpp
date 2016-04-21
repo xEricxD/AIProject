@@ -158,7 +158,7 @@ void AJPSPlusPathfinderActor::Tick( float DeltaTime )
 	Super::Tick( DeltaTime );
   DebugDraw();
 
-  if (!m_pathQueue.IsEmpty()) //the queue is not empty, there is an actor requesting a path
+  if (!m_pathQueue.IsEmpty()) // the queue is not empty, there is an actor requesting a path
   {
     FJPSPlusPathfindingPacket currentPacket;
     m_pathQueue.Peek(currentPacket);
@@ -202,12 +202,12 @@ bool AJPSPlusPathfinderActor::SearchLoop(FJPSPlusPathfindingPacket &a_packet)
     if (m_updateStepBased && !m_debugStep)
       break;
 
-    if ((m_openList.Num() == 0 && m_fastStack.Num() == 0) || m_openList.Num() > 1000) //realistically, it should never be over 1000, so terminate the path if it is
+    if ((m_openList.Num() == 0 && m_fastStack.Num() == 0) || m_openList.Num() > 1000) // It should never be over 1000, something went wrong, so terminate the path if it is
     {
-      //no valid path can be found
-      //remove the requester from the queue since path is invalid
+      // no valid path can be found
+      // remove the requester from the queue since path is invalid
       m_pathQueue.Dequeue(a_packet);
-      //Tell the requester their path request failed
+      // Tell the requester their path request failed
       ((UJPSPlusAgentComponent*)(a_packet.requestingActor))->PathRequestFailed();
       m_isFindingPath = false;
       Clear();
@@ -255,7 +255,7 @@ int AJPSPlusPathfinderActor::GetHeuristic(FPathfindingCell* a_cell)
 
 void AJPSPlusPathfinderActor::CreatePath(FPathfindingCell* a_cell, FPath* a_path)
 {
-  //backtrace the path to the starting node
+  // backtrace the path to the starting node
   a_path->path.Add(a_cell->position);
   if (a_cell->parentCell)
   {
@@ -265,7 +265,7 @@ void AJPSPlusPathfinderActor::CreatePath(FPathfindingCell* a_cell, FPath* a_path
 
 void AJPSPlusPathfinderActor::Clear()
 {
-  //Reset all used cells
+  // Reset all used cells
   for (FPathfindingCell* cell : m_closedList)
   {
     cell->f = cell->h = cell->g = 0;
@@ -353,10 +353,10 @@ void AJPSPlusPathfinderActor::JumpUpLeft(FPathfindingCell* a_current, short a_ju
     }
   }
 
-  //if we're not dealing with a target jump point, test for potential jump
+  // if we're not dealing with a target jump point, test for potential jump
   if (a_jumpDistance > 0)
   {
-    //we know we can immediatly jump to this distance (precalculated)
+    // we know we can immediatly jump to this distance (precalculated)
     short g = a_current->g + (a_jumpDistance * 14);
     FVector newIndex = currentIndex + FVector(-a_jumpDistance, -a_jumpDistance, 0);
     FPathfindingCell* newCell = m_grid->GetCellByIndex(newIndex);
@@ -370,8 +370,8 @@ void AJPSPlusPathfinderActor::JumpUp(FPathfindingCell* a_current, short a_jumpDi
   FVector currentIndex = a_current->gridIndex;
   FVector goalIndex = m_goalCell->gridIndex;
 
-  //start of by checking for a target jump point
-  if (currentIndex.X == goalIndex.X && currentIndex.Y > goalIndex.Y) //on the same X, and bigger Y -> there might be a target node that can help us reach the goal
+  // start of by checking for a target jump point
+  if (currentIndex.X == goalIndex.X && currentIndex.Y > goalIndex.Y) // on the same X, and bigger Y -> there might be a target node that can help us reach the goal
   {
     short absDistance = FMath::Abs(a_jumpDistance);
 
@@ -384,10 +384,10 @@ void AJPSPlusPathfinderActor::JumpUp(FPathfindingCell* a_current, short a_jumpDi
     }
   }
 
-  //if we're not dealing with a target jump point, test for potential jump
-  if (a_jumpDistance > 0) //not dealing with walls
+  // if we're not dealing with a target jump point, test for potential jump
+  if (a_jumpDistance > 0) // not dealing with walls
   {
-    //we know we can immediatly jump to this distance (precalculated)
+    // we know we can immediatly jump to this distance (precalculated)
     FVector newIndex = currentIndex + FVector(0, -a_jumpDistance, 0);
     FPathfindingCell* newCell = m_grid->GetCellByIndex(newIndex);
     short g = a_current->g + (a_jumpDistance * 10);
@@ -401,8 +401,8 @@ void AJPSPlusPathfinderActor::JumpUpRight(FPathfindingCell* a_current, short a_j
   FVector currentIndex = a_current->gridIndex;
   FVector goalIndex = m_goalCell->gridIndex;
 
-  //check for target jump point
-  if (currentIndex.X < goalIndex.X && currentIndex.Y > goalIndex.Y) //our goal node is in the direction we're jumping towards
+  // check for target jump point
+  if (currentIndex.X < goalIndex.X && currentIndex.Y > goalIndex.Y) // our goal node is in the direction we're jumping towards
   {
     short absDistance = FMath::Abs(a_jumpDistance);
 
@@ -419,10 +419,10 @@ void AJPSPlusPathfinderActor::JumpUpRight(FPathfindingCell* a_current, short a_j
     }
   }
 
-  //if we're not dealing with a target jump point, test for potential jump
+  // if we're not dealing with a target jump point, test for potential jump
   if (a_jumpDistance > 0)
   {
-    //we know we can immediatly jump to this distance (precalculated)
+    // we know we can immediatly jump to this distance (precalculated)
     short g = a_current->g + (a_jumpDistance * 14);
     FVector newIndex = currentIndex + FVector(a_jumpDistance, -a_jumpDistance, 0);
     FPathfindingCell* newCell = m_grid->GetCellByIndex(newIndex);
@@ -436,12 +436,12 @@ void AJPSPlusPathfinderActor::JumpLeft(FPathfindingCell* a_current, short a_jump
   FVector currentIndex = a_current->gridIndex;
   FVector goalIndex = m_goalCell->gridIndex;
 
-  //start of by checking for a target jump point
+  // start of by checking for a target jump point
   if (currentIndex.Y == goalIndex.Y && currentIndex.X > goalIndex.X)
   {
     short absDistance = FMath::Abs(a_jumpDistance);
 
-    if ((currentIndex.X - absDistance) <= goalIndex.X) //we can jump straight to the goal
+    if ((currentIndex.X - absDistance) <= goalIndex.X) // we can jump straight to the goal
     {
       short diff = currentIndex.X - goalIndex.X;
       short g = a_current->g + (FMath::Abs(diff) * 10);
@@ -452,7 +452,7 @@ void AJPSPlusPathfinderActor::JumpLeft(FPathfindingCell* a_current, short a_jump
 
   if (a_jumpDistance > 0)
   {
-    //we know we can immediatly jump to this distance (precalculated)
+    // we know we can immediatly jump to this distance (precalculated)
     FVector newIndex = currentIndex + FVector(-a_jumpDistance, 0, 0);
     FPathfindingCell* newCell = m_grid->GetCellByIndex(newIndex);
     short g = a_current->g + (a_jumpDistance * 10);
@@ -466,12 +466,12 @@ void AJPSPlusPathfinderActor::JumpRight(FPathfindingCell* a_current, short a_jum
   FVector currentIndex = a_current->gridIndex;
   FVector goalIndex = m_goalCell->gridIndex;
 
-  //start of by checking for a target jump point
+  // start of by checking for a target jump point
   if (currentIndex.Y == goalIndex.Y && currentIndex.X < goalIndex.X)
   {
     short absDistance = FMath::Abs(a_jumpDistance);
 
-    if ((currentIndex.X + absDistance) >= goalIndex.X) //we can jump straight to the goal
+    if ((currentIndex.X + absDistance) >= goalIndex.X) // we can jump straight to the goal
     {
       short diff = currentIndex.X - goalIndex.X;
       short g = a_current->g + (FMath::Abs(diff) * 10);
@@ -482,7 +482,7 @@ void AJPSPlusPathfinderActor::JumpRight(FPathfindingCell* a_current, short a_jum
 
   if (a_jumpDistance > 0)
   {
-    //we know we can immediatly jump to this distance (precalculated)
+    // we know we can immediatly jump to this distance (precalculated)
     FVector newIndex = currentIndex + FVector(a_jumpDistance, 0, 0);
     FPathfindingCell* newCell = m_grid->GetCellByIndex(newIndex);
     short g = a_current->g + (a_jumpDistance * 10);
@@ -496,8 +496,8 @@ void AJPSPlusPathfinderActor::JumpDownLeft(FPathfindingCell* a_current, short a_
   FVector currentIndex = a_current->gridIndex;
   FVector goalIndex = m_goalCell->gridIndex;
 
-  //check for target jump point
-  if (currentIndex.X > goalIndex.X && currentIndex.Y < goalIndex.Y) //our goal node is in the direction we're jumping towards
+  // check for target jump point
+  if (currentIndex.X > goalIndex.X && currentIndex.Y < goalIndex.Y) // our goal node is in the direction we're jumping towards
   {
     short absDistance = FMath::Abs(a_jumpDistance);
 
@@ -514,10 +514,10 @@ void AJPSPlusPathfinderActor::JumpDownLeft(FPathfindingCell* a_current, short a_
     }
   }
 
-  //if we're not dealing with a target jump point, test for potential jump
+  // if we're not dealing with a target jump point, test for potential jump
   if (a_jumpDistance > 0)
   {
-    //we know we can immediatly jump to this distance (precalculated)
+    // we know we can immediatly jump to this distance (precalculated)
     FVector newIndex = currentIndex + FVector(-a_jumpDistance, a_jumpDistance, 0);
     FPathfindingCell* newCell = m_grid->GetCellByIndex(newIndex);
     short g = a_current->g + (a_jumpDistance * 14);
@@ -531,8 +531,8 @@ void AJPSPlusPathfinderActor::JumpDown(FPathfindingCell* a_current, short a_jump
   FVector currentIndex = a_current->gridIndex;
   FVector goalIndex = m_goalCell->gridIndex;
 
-  //start of by checking for a target jump point
-  if (currentIndex.X == goalIndex.X && currentIndex.Y < goalIndex.Y) //on the same X, and smaller Y -> there might be a target node that can help us reach the goal
+  // start of by checking for a target jump point
+  if (currentIndex.X == goalIndex.X && currentIndex.Y < goalIndex.Y) // on the same X, and smaller Y -> there might be a target node that can help us reach the goal
   {
     short absDistance = FMath::Abs(a_jumpDistance);
 
@@ -545,10 +545,10 @@ void AJPSPlusPathfinderActor::JumpDown(FPathfindingCell* a_current, short a_jump
     }
   }
 
-  //if we're not dealing with a target jump point, test for potential jump
-  if (a_jumpDistance > 0) //not dealing with walls
+  // if we're not dealing with a target jump point, test for potential jump
+  if (a_jumpDistance > 0) // not dealing with walls
   {
-    //we know we can immediatly jump to this distance (precalculated)
+    // we know we can immediatly jump to this distance (precalculated)
     FVector newIndex = currentIndex + FVector(0, a_jumpDistance, 0);
     FPathfindingCell* newCell = m_grid->GetCellByIndex(newIndex);
     short g = a_current->g + (a_jumpDistance * 10);
@@ -562,8 +562,8 @@ void AJPSPlusPathfinderActor::JumpDownRight(FPathfindingCell* a_current, short a
   FVector currentIndex = a_current->gridIndex;
   FVector goalIndex = m_goalCell->gridIndex;
 
-  //check for target jump point
-  if (currentIndex.X < goalIndex.X && currentIndex.Y < goalIndex.Y) //our goal node is in the direction we're jumping towards
+  // check for target jump point
+  if (currentIndex.X < goalIndex.X && currentIndex.Y < goalIndex.Y) // our goal node is in the direction we're jumping towards
   {
     short absDistance = FMath::Abs(a_jumpDistance);
 
@@ -580,10 +580,10 @@ void AJPSPlusPathfinderActor::JumpDownRight(FPathfindingCell* a_current, short a
     }
   }
 
-  //if we're not dealing with a target jump point, test for potential jump
+  // if we're not dealing with a target jump point, test for potential jump
   if (a_jumpDistance > 0)
   {
-    //we know we can immediatly jump to this distance (precalculated)
+    // we know we can immediatly jump to this distance (precalculated)
     FVector newIndex = currentIndex + FVector(a_jumpDistance, a_jumpDistance, 0);
     FPathfindingCell* newCell = m_grid->GetCellByIndex(newIndex);
     short g = a_current->g + (a_jumpDistance * 14);
@@ -600,7 +600,7 @@ void AJPSPlusPathfinderActor::AddCellToOpenList(FPathfindingCell* a_newCell, FPa
 {
   if (a_newCell->cellType == EListStatus::NONE)
   {
-    //if we find a jump point, give it all its values and add it to the open list, as with Astar
+    // if we find a jump point, give it all its values and add it to the open list, as with Astar
     a_newCell->g = a_g;
     a_newCell->cellType = EListStatus::ON_OPEN;
     a_newCell->parentCell = a_parentCell;
@@ -692,7 +692,7 @@ void AJPSPlusPathfinderActor::DebugDraw()
     }
   }
 
-  //draw info for target jump points
+  // draw info for target jump points
   if (!m_pathQueue.IsEmpty())
   {
     FJPSPlusPathfindingPacket currentPacket;
@@ -700,7 +700,7 @@ void AJPSPlusPathfinderActor::DebugDraw()
 
     FPathfindingCell* target = currentPacket.targetCell;
 
-    //draw x-line
+    // draw x-line
     FPathfindingCell* startCell = m_grid->GetCellByIndex(FVector(target->gridIndex.X, 0, 0));
     FPathfindingCell* endCell = m_grid->GetCellByIndex(FVector(target->gridIndex.X, m_grid->GetGridSize().Y - 1, 0));
     if (startCell && endCell)
@@ -711,7 +711,7 @@ void AJPSPlusPathfinderActor::DebugDraw()
         );
     }
 
-    //draw y-line
+    // draw y-line
     startCell = m_grid->GetCellByIndex(FVector(0, target->gridIndex.Y, 0));
     endCell = m_grid->GetCellByIndex(FVector(m_grid->GetGridSize().X - 1, target->gridIndex.Y, 0));
     if (startCell && endCell)
@@ -722,15 +722,15 @@ void AJPSPlusPathfinderActor::DebugDraw()
         );
     }
 
-    //draw diagonal lines
-    //get top left corner
+    // draw diagonal lines
+    // get top left corner
     FVector index = target->gridIndex;
     FVector goal = FVector::ZeroVector;
     FVector diff = index - goal;
     short smallestDiff = (diff.X < diff.Y) ? diff.X : diff.Y;
     FVector newIndex = FVector(index.X - smallestDiff, index.Y - smallestDiff, index.Z);
     startCell = m_grid->GetCellByIndex(newIndex);
-    //bottom right corner
+    // bottom right corner
     index = target->gridIndex;
     goal = m_grid->GetGridSize() - FVector(1, 1, 0);
     diff = goal - index;
@@ -745,7 +745,7 @@ void AJPSPlusPathfinderActor::DebugDraw()
         );
     }
 
-    //get top right corner
+    // get top right corner
     index = target->gridIndex;
     goal = FVector(m_grid->GetGridSize().X - 1, 0, 0);
     diff = FVector(goal.X - index.X, index.Y - goal.Y, index.Z);

@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+//Fill out your copyright notice in the Description page of Project Settings.
 
 #include "FeatureProject.h"
 #include "JPSAgentComponent.h"
@@ -21,9 +21,9 @@ void UJPSAgentComponent::BeginPlay()
     m_pathfinder = *Itr;
 
   if (!m_pathfinder)
-    UE_LOG(LogTemp, Warning, TEXT("ERROR: could not find pathfinder"));
+    UE_LOG(LogTemp, Warning, TEXT("ERROR: could not find pathfinder, JPSAgentComponent.cpp"));
   if (!m_grid)
-    UE_LOG(LogTemp, Warning, TEXT("ERROR: could not find grid"));
+    UE_LOG(LogTemp, Warning, TEXT("ERROR: could not find grid, JPSAgentComponent.cpp"));
 }
 
 void UJPSAgentComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -35,7 +35,7 @@ void UJPSAgentComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAc
     CalculatePointsAndRequestPath(m_targetPosDebug);
     m_calculatePointsAndRequestPath = false;
   }
-
+  //if we have a path, make sure it's not empty, and draw debug information
   if (m_path)
   {
     if (!m_path->path.Num())
@@ -63,7 +63,7 @@ void UJPSAgentComponent::CancelCurrentPath()
     FJPSCell* current = m_grid->GetCellByPosition(pos);
     if (current && !current->walkable)
     {
-      // push ourselves out
+      //push ourselves out
       FVector dir = pos - current->position;
       dir.X = FMath::Clamp<float>(dir.X, -1, 1);
       dir.Y = FMath::Clamp<float>(dir.Y, -1, 1);

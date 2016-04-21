@@ -1,22 +1,21 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+//Fill out your copyright notice in the Description page of Project Settings.
 //references
 //http://zerowidth.com/2013/05/05/jump-point-search-explained.html
 //http://grastien.net/ban/articles/hg-aaai11.pdf
-//http://gdcvault.com/play/1022094/JPS-Over-100x-Faster-than
 
 #include "FeatureProject.h"
 #include "JPSAgentComponent.h"
 #include "JPSPathfinder.h"
 
-// Sets default values
+//Sets default values
 AJPSPathfinderActor::AJPSPathfinderActor()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+ 	//Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
 }
 
-// Called when the game starts or when spawned
+//Called when the game starts or when spawned
 void AJPSPathfinderActor::BeginPlay()
 {
 	Super::BeginPlay();
@@ -38,7 +37,7 @@ void AJPSPathfinderActor::RequestPath(UActorComponent* a_requester, FJPSCell* a_
   m_pathQueue.Enqueue(newPacket);
 }
 
-// Called every frame
+//Called every frame
 void AJPSPathfinderActor::Tick( float DeltaTime )
 {
 	Super::Tick( DeltaTime );
@@ -106,7 +105,7 @@ bool AJPSPathfinderActor::SearchLoop(FJPSPathfindingPacket &a_packet)
         cell = c;
     }
 
-    // remove lowest f node from open list and add to closed list
+    //remove lowest f node from open list and add to closed list
     m_openList.Remove(cell);
 
     if (cell != a_packet.targetCell)
@@ -145,11 +144,11 @@ void AJPSPathfinderActor::AddNeighbors(FJPSCell* a_cell)
     dir.X = FMath::Clamp<float>(dir.X, -1, 1);
     dir.Y = FMath::Clamp<float>(dir.Y, -1, 1);
 
-    // test if we're jumping diagonal or straight
+    //test if we're jumping diagonal or straight
     if (dir.X != 0 && dir.Y != 0)
-      neighbors = JumpDiagonal(a_cell, dir);
+      neighbors = PruneDiagonal(a_cell, dir);
     else
-      neighbors = JumpStraight(a_cell, dir);
+      neighbors = PruneStraight(a_cell, dir);
   }
   else //no parent cell -> dont prune any neighbors
   {
@@ -163,7 +162,7 @@ void AJPSPathfinderActor::AddNeighbors(FJPSCell* a_cell)
     }
   }
 
-  // Now that we pruned all the neighbors we don't need, try to jump for each neighbor we do need to check
+  //Now that we pruned all the neighbors we don't need, try to jump for each neighbor we do need to check
   for (FJPSCell* neighbor : neighbors)
   {
     FVector dir = neighbor->gridIndex - neighbor->parentCell->gridIndex;
@@ -186,50 +185,50 @@ void AJPSPathfinderActor::AddNeighbors(FJPSCell* a_cell)
   }
 }
 
-TArray<FJPSCell*> AJPSPathfinderActor::JumpStraight(FJPSCell* a_current, FVector a_jumpDirection)
+TArray<FJPSCell*> AJPSPathfinderActor::PruneStraight(FJPSCell* a_current, FVector a_jumpDirection)
 {
   TArray<FJPSCell*> neighbors;
 
-  // make sure we can move to the node
+  //make sure we can move to the node
   FJPSCell* c = m_grid->GetCellByIndex(a_current->gridIndex + a_jumpDirection);
   if (!c || !c->walkable)
     return neighbors;
-  // add the node we're trying to move to
+  //add the node we're trying to move to
   c->parentCell = a_current;
   neighbors.Add(c);
 
-  // does this cell have a forced neighbor
+  //does this cell have a forced neighbor
   bool forced = false;
 
-  // set the correct offsets based on the direction we're trying to move in
+  //set the correct offsets based on the direction we're trying to move in
   FVector offset[2];
-  if (a_jumpDirection.X != 0) // moving horizontally
+  if (a_jumpDirection.X != 0) //moving horizontally
   {
     offset[0] = FVector(0, 1, 0);
     offset[1] = FVector(0, -1, 0);
   }
-  else // moving vertically
+  else //moving vertically
   {
     offset[0] = FVector(1, 0, 0);
     offset[1] = FVector(-1, 0, 0);
   }
 
-  // now check these offets on forced neighbors
+  //now check these offets on forced neighbors
   for (int i = 0; i < 2; i++)
   {
     if (CheckStraightForcedNeighbor(a_current, offset[i], a_jumpDirection))
     {
-      // forced neighbor check makes sure the cell exists, no need for null checking
+      //forced neighbor check makes sure the cell exists, no need for null checking
       FJPSCell* forced = m_grid->GetCellByIndex(a_current->gridIndex + a_jumpDirection + offset[i]);
       forced->parentCell = a_current;
-      neighbors.Add(forced); // if true, the neighbor is forced and we add it to the list of neighbors to check
+      neighbors.Add(forced); //if true, the neighbor is forced and we add it to the list of neighbors to check
     }
   }
 
   return neighbors;
 }
 
-TArray<FJPSCell*> AJPSPathfinderActor::JumpDiagonal(FJPSCell* a_current, FVector a_jumpDirection)
+TArray<FJPSCell*> AJPSPathfinderActor::PruneDiagonal(FJPSCell* a_current, FVector a_jumpDirection)
 {
   TArray<FJPSCell*> neighbors;
   //check if we can even move diagonal (if c1 && c2 !walkable, it means we cannot move diagonal , movement would be blocked)
@@ -289,53 +288,53 @@ short AJPSPathfinderActor::GetGValueJPS(FJPSCell* a_jumpPoint, FJPSCell* a_paren
 
 FJPSCell* AJPSPathfinderActor::FindJumpPoint(FJPSCell* a_cell, FVector a_dir, FJPSCell* a_startCell, FJPSCell* a_targetCell)
 {
-  // start of by "jumping" one step in the desired direction
+  //start of by "jumping" one step in the desired direction
   FJPSCell* n = m_grid->GetCellByIndex(a_cell->gridIndex + a_dir);
-  if (!n || !n->walkable) // stop jumping if we hit a block, and return null. This jump is invalid and we don't need to look at it any further
+  if (!n || !n->walkable) //stop jumping if we hit a block, and return null. This jump is invalid and we don't need to look at it any further
     return nullptr;
-  if (n == a_targetCell) // we've reached our target, stop jumping and return n
+  if (n == a_targetCell) //we've reached our target, stop jumping and return n
     return n;
-  // check if there is any forced neighbors on the node, if so, return n
+  //check if there is any forced neighbors on the node, if so, return n
   if (a_dir.X == 0 || a_dir.Y == 0) //straight move
   {
     FVector offset[2];
-    if (a_dir.X != 0) // moving horizontally
+    if (a_dir.X != 0) //moving horizontally
       offset[0] = FVector(0, 1, 0), offset[1] = FVector(0, -1, 0);
-    else // moving vertically
+    else //moving vertically
       offset[0] = FVector(1, 0, 0), offset[1] = FVector(-1, 0, 0);
     for (int i = 0; i < 2; i++)
     {
       if (CheckStraightForcedNeighbor(n, offset[i], a_dir))
-        return n; // if a forced neighbor is found, return n so it can be furter examined in the next iteration
+        return n; //if a forced neighbor is found, return n so it can be furter examined in the next iteration
     }
   }
-  else // diagonal move
+  else //diagonal move
   {
-    // first check if a diagonal forced neighbor is found, if so, return n
+    //first check if a diagonal forced neighbor is found, if so, return n
     if (CheckDiagonalForcedNeighbor(n, FVector(-a_dir.X, 0, 0), a_dir))
       return n;
     if (CheckDiagonalForcedNeighbor(n, FVector(0, -a_dir.Y, 0), a_dir))
       return n;
 
-    // if not returned at this point, check both straights of the diagonal for a jump point
-    // if we find one, return n and end the jump
+    //if not returned at this point, check both straights of the diagonal for a jump point
+    //if we find one, return n and end the jump
     if (FindJumpPoint(n, FVector(a_dir.X, 0, 0), a_startCell, a_targetCell))
       return n;
     if (FindJumpPoint(n, FVector(0, a_dir.Y, 0), a_startCell, a_targetCell))
       return n;
   }
-  // keep recursing until a return is hit
+  //keep recursing until a return is hit
   return FindJumpPoint(n, a_dir, a_startCell, a_targetCell);
 }
 
 bool AJPSPathfinderActor::CheckStraightForcedNeighbor(FJPSCell* a_cell, FVector a_offset, FVector a_dir)
 {
   FJPSCell* c = m_grid->GetCellByIndex(a_cell->gridIndex + a_offset);
-  if (!c || !c->walkable) // test if the node diagonal from our starting node is avaiable
+  if (!c || !c->walkable) //test if the node diagonal from our starting node is avaiable
   {
     c = m_grid->GetCellByIndex(a_cell->gridIndex + a_dir + a_offset);
-    if (c && c->walkable) // if it is->
-      return true; // c is a forced neighbor, return true
+    if (c && c->walkable) //if it is->
+      return true; //c is a forced neighbor, return true
   }
   return false;
 }
@@ -343,11 +342,11 @@ bool AJPSPathfinderActor::CheckStraightForcedNeighbor(FJPSCell* a_cell, FVector 
 bool AJPSPathfinderActor::CheckDiagonalForcedNeighbor(FJPSCell* a_cell, FVector a_offset, FVector a_dir)
 {
   FJPSCell* c = m_grid->GetCellByIndex(a_cell->gridIndex + a_offset);
-  if (!c || !c->walkable) // test if the node diagonal from our starting node is avaiable
+  if (!c || !c->walkable) //test if the node diagonal from our starting node is avaiable
   {
     FVector offset = (a_offset.X == 0) ? FVector(a_dir.X, 0, 0) : FVector(0, a_dir.Y, 0);
     c = m_grid->GetCellByIndex(a_cell->gridIndex + offset + a_offset);
-    if (c && c->walkable) // if it is->
+    if (c && c->walkable) //if it is->
       return true; //c is forced, return true
   }
   return false;

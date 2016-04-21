@@ -1,22 +1,22 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+//Fill out your copyright notice in the Description page of Project Settings.
 
 #include "FeatureProject.h"
 #include "JPSPlusAgentComponent.h"
 #include "AgentPathFollowingComponent.h"
 
-// Sets default values for this component's properties
+//Sets default values for this component's properties
 UJPSPlusAgentComponent::UJPSPlusAgentComponent()
 {
-	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
-	// off to improve performance if you don't need them.
+	//Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
+	//off to improve performance if you don't need them.
 	bWantsBeginPlay = true;
 	PrimaryComponentTick.bCanEverTick = true;
 
-	// ...
+	//...
 }
 
 
-// Called when the game starts
+//Called when the game starts
 void UJPSPlusAgentComponent::BeginPlay()
 {
 	Super::BeginPlay();
@@ -28,13 +28,13 @@ void UJPSPlusAgentComponent::BeginPlay()
     m_pathfinder = *Itr;
 
   if (!m_pathfinder)
-    UE_LOG(LogTemp, Warning, TEXT("ERROR: could not find pathfinder")); // changed this to warning, this is not an error, minions should be able to exist in a scene without pathfinder
+    UE_LOG(LogTemp, Warning, TEXT("ERROR: could not find pathfinder, JPSPlusAgentComponent.cpp")); 
   if (!m_grid)
-    UE_LOG(LogTemp, Warning, TEXT("ERROR: could not find grid")); // again not an error. Dont change this please, it takes me at least 30 minutes extra to get a working build working....
+    UE_LOG(LogTemp, Warning, TEXT("ERROR: could not find grid, JPSPlusAgentComponent.cpp")); 
 }
 
 
-// Called every frame
+//Called every frame
 void UJPSPlusAgentComponent::TickComponent( float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction )
 {
 	Super::TickComponent( DeltaTime, TickType, ThisTickFunction );
@@ -44,7 +44,7 @@ void UJPSPlusAgentComponent::TickComponent( float DeltaTime, ELevelTick TickType
     CalculatePointsAndRequestPath(m_targetPosDebug);
     m_calculatePointsAndRequestPath = false;
   }
-
+  //make sure we still have path nodes left on our path, and draw debug info if needed
   if (m_path)
   {
     if (!m_path->path.Num())
@@ -73,7 +73,7 @@ void UJPSPlusAgentComponent::CancelCurrentPath()
   FPathfindingCell* current = m_grid->GetCellByPosition(pos);
   if (current && !current->walkable)
   {
-    // push ourselves out
+    //push ourselves out
     FVector dir = pos - current->position;
     dir.X = FMath::Clamp<float>(dir.X, -1, 1);
     dir.Y = FMath::Clamp<float>(dir.Y, -1, 1);
